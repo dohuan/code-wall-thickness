@@ -13,14 +13,14 @@ test.x = train_x(ix(cutix+1:end),:);
 test.y = train_y(ix(cutix+1:end),1);
 
 % --- Use LASSO
-[FitObj,y_train_eval,y_test_eval] = ...
-    lassoRegression(train.x,train.y,test.x,test.y,.6);
-fprintf('RMSE of LASSO: %.2f\n',rmseCal(y_test_eval,test.y));
+% [FitObj,y_train_eval,y_test_eval] = ...
+%     lassoRegression(train.x,train.y,test.x,test.y,.6);
+% fprintf('RMSE of LASSO: %.2f\n',rmseCal(y_test_eval,test.y));
 
 % --- Use REP tree
-% FitTree = fitctree(train.x,train.y);
-% y_test_tree = predict(FitTree,test.x);
-% fprintf('RMSE of REP tree: %.2f\n',rmseCal(y_test_tree,test.y));
+FitTree = fitctree(train.x,train.y);
+y_test_tree = predict(FitTree,test.x);
+fprintf('RMSE of REP tree: %.2f\n',rmseCal(y_test_tree,test.y));
 
 %% Apply to human data
 
@@ -41,7 +41,9 @@ for i=1:length(dcm_files)
         
         for j=1:length(sliceix)
             ix = sliceix(j);
-            thickness_est(i,j) = FitObj.B_optimal'*test_x(ix,:)';
+            %thickness_est(i,j) = FitObj.B_optimal'*test_x(ix,:)';
+            thickness_est(i,j) = predict(FitTree,test_x(ix,:));
+            
             thickness_est_pixel = (sqrt(pixelspacing(1)^2+pixelspacing(2)^2))^(-1)...
                 *thickness_est(i,j);
             
