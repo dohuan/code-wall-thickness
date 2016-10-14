@@ -53,6 +53,13 @@ end
 
 
 
+figure(1)
+hold on
+plot(xc,yc,'r.');
+for i=1:size(xtrack,1)
+	plot(xtrack(i),ytrack(i),'k.');
+end
+
 
 
 

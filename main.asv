@@ -50,10 +50,10 @@ for i=1:length(dcm_files)
             thickness_est_pixel = (sqrt(pixelspacing(1)^2+pixelspacing(2)^2))^(-1)...
                 *thickness_est(i,j);
             
-            point1(1) = wallpoint(1) + cos(test_info(ix,2))*thickness_est_pixel/2;
-            point1(2) = wallpoint(2) - sin(test_info(ix,2))*thickness_est_pixel/2;
-            point2(1) = wallpoint(1) - cos(test_info(ix,2))*thickness_est_pixel/2;
-            point2(2) = wallpoint(2) + sin(test_info(ix,2))*thickness_est_pixel/2;
+            point1(1) = test_info(ix,5) + cos(test_info(ix,2))*thickness_est_pixel/2;
+            point1(2) = test_info(ix,6) - sin(test_info(ix,2))*thickness_est_pixel/2;
+            point2(1) = test_info(ix,5) - cos(test_info(ix,2))*thickness_est_pixel/2;
+            point2(2) = test_info(ix,6) + sin(test_info(ix,2))*thickness_est_pixel/2;
             
             plot(point1(1),point1(2),'k.','MarkerSize',10);
             plot(point2(1),point2(2),'r.','MarkerSize',10);
@@ -67,11 +67,11 @@ for i=1:length(dcm_files)
     end
 end
 
-% figure(2)
-% hold on
-% for i=1:size(thickness_est,1)
-%     plot(thickness_est(i,:));
-% end
+figure(2)
+hold on
+for i=1:size(thickness_est,1)
+    plot(thickness_est(i,:));
+end
 
 
 
