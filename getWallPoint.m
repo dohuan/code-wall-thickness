@@ -1,4 +1,4 @@
-function wallpoint = getWallPoint(img,rayinfo)
+function [ray_fit, wallpoint] = getWallPoint(img,rayinfo)
 %% 
 raystep = 2; % pixels
 raynum = 10;
@@ -17,7 +17,11 @@ for i=1:raynum
     ytrack = [ytrack;y];
 end
 
-[~,wallix] = max(gradient(ray));
+t=(1:length(ray))';
+f = polyfit(t,ray,3);
+ray_fit = polyval(f,t);
+
+[~,wallix] = max(gradient(ray_fit));
 wallpoint = [xtrack(wallix) ytrack(wallix)];
 
 end

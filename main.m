@@ -39,11 +39,12 @@ for i=1:length(dcm_files)
         hold on
         % --- Apply LASSO to find thickness and plot on dcm figure
         
+        track_ray = [];
         for j=1:length(sliceix)
             ix = sliceix(j);
             
-            wallpoint = getWallPoint(img,test_info(ix,:));
-            
+            [raytmp, wallpoint] = getWallPoint(img,test_info(ix,:));
+            track_ray = [track_ray; raytmp'];
             %thickness_est(i,j) = FitObj.B_optimal'*test_x(ix,:)';
             thickness_est(i,j) = predict(FitTree,test_x(ix,:));
             
