@@ -28,22 +28,30 @@ load ./data/data_human
 % test_info: slice (1) angle (2) centroid (3 4) point (5 6)
 pixelspacing = [0.6621 0.6621]; % found in dicominfo
 dcm_files = dir('./data/P11 S04 AAA/*.dcm');
+dump_dir = './data/dicomTopngDump/';
 
 for i=1:length(dcm_files)
     sliceix = find(test_info(:,1)==str2double(dcm_files(i).name(6:8)));
     if (isempty(sliceix)==0)
         fprintf('Processing slice: %s\n',dcm_files(i).name(6:8));
+        % --- stupid code here but it works!
         img = dicomread(['./data/P11 S04 AAA/' dcm_files(i).name]);
+        image8 = uint8(255 * mat2gray(img));
+        imwrite(image8,[dump_dir dcm_files(i).name '.png']);
+        img = imread([dump_dir dcm_files(i).name '.png']);
+        img = im2double(img);
+        
         h=figure(1);
-        imagesc(img);
+        %imagesc(img);
+        imshow(img);
         hold on
         % --- Apply LASSO to find thickness and plot on dcm figure
         
         track_ray = [];
         for j=1:length(sliceix)
             ix = sliceix(j);
-            
-            [raytmp, wallpoint] = getWallPoint(img,test_info(ix,:));
+            J = regiongrowing(img,round(test_info(ix,3)),round(test_info(ix,4)),0.2);
+            [raytmp, wallpoint] = getWallPoint(J,test_info(ix,:));
             track_ray = [track_ray; raytmp'];
             %thickness_est(i,j) = FitObj.B_optimal'*test_x(ix,:)';
             thickness_est(i,j) = predict(FitTree,test_x(ix,:));
@@ -60,8 +68,10 @@ for i=1:length(dcm_files)
             plot(point2(1),point2(2),'r.','MarkerSize',10);
         end
         hold off;
-        saveName = [dcm_files(i).name(6:8) '.jpg'];
-        saveas(h,['./results/' saveName]);
+        saveName = [dcm_files(i).name(6:8)];
+        saveas(h,['./results/' saveName '.fig']);
+        %hc = imcrop(h,[200 200 120 70]);
+        %saveas(hc,['./results/crop/' saveName '.jpg']);
         close(h);
     else
         fprintf('No slice info available!\n');

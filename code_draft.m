@@ -62,14 +62,54 @@ end
 
 
 
+% --- test some filter
+vector = 5*(1+cosd(1:3:180)) + 2 * rand(1, 60);
+plot(vector, 'r-', 'linewidth', 3);
+windowWidth = int16(5);
+halfWidth = windowWidth / 2;
+gaussFilter = gausswin(5);
+gaussFilter = gaussFilter / sum(gaussFilter); % Normalize.
+secondDFilter = [-1,2,-1];
+vector_{1} = conv(vector, gaussFilter);
+vector_{2} = conv(vector, secondFilter);
 
 
+% --- test track_ray
+figure(2)
+hold on
+for k=1:size(track_ray,1)
+plot(track_ray(k,:))
+end
+
+figure(3)
+hold on
+for k=1:size(track_ray,1)
+plot(gradient(track_ray(k,:)))
+end
+
+figure(4)
+secondDFilter = [-1,2,-1];
+hold on
+for k=1:size(track_ray,1)
+	tmp = conv(track_ray(k,:),secondDFilter);
+	plot(tmp(2:end-1));
+end
 
 
+% --- test region growing
+%img = im2double(imread('medtest.png'));
+%x=198; y=359;
+I=im2double(I);
+%x=round(test_info(ix,3)); y=round(test_info(ix,4));
+x=258; y=245;
+J = regiongrowing(I,x,y,0.2); 
+figure(1)
+imshow(I+J);
+hold on
+plot(x,y,'r.','MarkerSize',3);
 
 
-
-
-
-
+% --- test convert dicom to other image type
+[img, ~] = dicomread(['./data/P11 S04 AAA/' dcm_files(i).name]);
+image8 = uint8(255 * mat2gray(img));
 
