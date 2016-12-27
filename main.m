@@ -26,9 +26,10 @@ fprintf('RMSE of REP tree: %.2f\n',rmseCal(y_test_tree,test.y));
 
 load ./data/data_human
 % test_info: slice (1) angle (2) centroid (3 4) point (5 6)
-pixelspacing = [0.6621 0.6621]; % found in dicominfo
 dcm_files = dir('./data/P11 S04 AAA/*.dcm');
 dump_dir = './data/dicomTopngDump/';
+wall.inner = [];
+wall.outer = [];
 
 for i=1:length(dcm_files)
     sliceix = find(test_info(:,1)==str2double(dcm_files(i).name(6:8)));
@@ -36,6 +37,10 @@ for i=1:length(dcm_files)
         fprintf('Processing slice: %s\n',dcm_files(i).name(6:8));
         % --- stupid code here but it works!
         img = dicomread(['./data/P11 S04 AAA/' dcm_files(i).name]);
+        dinfo = dicominfo(['./data/P11 S04 AAA/' dcm_files(i).name]);
+        pixelspacing = dinfo.PixelSpacing;
+        pixelspacingunified = (sqrt(pixelspacing(1)^2+pixelspacing(2)^2))^(-1);
+        
         image8 = uint8(255 * mat2gray(img));
         imwrite(image8,[dump_dir dcm_files(i).name '.png']);
         img = imread([dump_dir dcm_files(i).name '.png']);
@@ -45,31 +50,38 @@ for i=1:length(dcm_files)
         %imagesc(img);
         imshow(img);
         hold on
-        % --- Apply LASSO to find thickness and plot on dcm figure
+        % --- Apply regression to find thickness and plot on dcm figure
         
-        track_ray = [];
+        %track_ray = [];
+        
         for j=1:length(sliceix)
             ix = sliceix(j);
             J = regiongrowing(img,round(test_info(ix,3)),round(test_info(ix,4)),0.2);
-            [raytmp, wallpoint] = getWallPoint(J,test_info(ix,:));
-            track_ray = [track_ray; raytmp'];
+            [~, wallpoint] = getWallPoint(J,test_info(ix,:));
+            %track_ray = [track_ray; raytmp'];
             %thickness_est(i,j) = FitObj.B_optimal'*test_x(ix,:)';
-            thickness_est(i,j) = predict(FitTree,test_x(ix,:));
+            thickness_est = predict(FitTree,test_x(ix,:));
             
-            thickness_est_pixel = (sqrt(pixelspacing(1)^2+pixelspacing(2)^2))^(-1)...
-                *thickness_est(i,j);
+            
+            thickness_est_pixel = pixelspacingunified*thickness_est;
             
             point1(1) = wallpoint(1) + cos(test_info(ix,2))*thickness_est_pixel/2;
             point1(2) = wallpoint(2) - sin(test_info(ix,2))*thickness_est_pixel/2;
             point2(1) = wallpoint(1) - cos(test_info(ix,2))*thickness_est_pixel/2;
             point2(2) = wallpoint(2) + sin(test_info(ix,2))*thickness_est_pixel/2;
             
-            plot(point1(1),point1(2),'k.','MarkerSize',10);
-            plot(point2(1),point2(2),'r.','MarkerSize',10);
+            plot(point1(1),point1(2),'k.','MarkerSize',10); % outer
+            plot(point2(1),point2(2),'r.','MarkerSize',10); % inner
+            
+            wall.inner = [wall.inner;...
+                [point2*pixelspacingunified dinfo.SliceLocation]];
+            wall.outer = [wall.outer;...
+                [point1*pixelspacingunified dinfo.SliceLocation]];
         end
         hold off;
         saveName = [dcm_files(i).name(6:8)];
-        saveas(h,['./results/' saveName '.fig']);
+        saveas(h,['./results/fig/' saveName '.fig']);
+        saveas(h,['./results/jpg/' saveName '.jpg']);
         %hc = imcrop(h,[200 200 120 70]);
         %saveas(hc,['./results/crop/' saveName '.jpg']);
         close(h);
@@ -77,6 +89,9 @@ for i=1:length(dcm_files)
         fprintf('No slice info available!\n');
     end
 end
+
+% --- save wall as point cloud
+save('results/wall','wall');
 
 % figure(2)
 % hold on
