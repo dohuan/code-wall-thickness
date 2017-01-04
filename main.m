@@ -53,7 +53,8 @@ for i=1:length(dcm_files)
         % --- Apply regression to find thickness and plot on dcm figure
         
         %track_ray = [];
-        
+        point2Dinner = [];
+        point2Douter = [];
         for j=1:length(sliceix)
             ix = sliceix(j);
             J = regiongrowing(img,round(test_info(ix,3)),round(test_info(ix,4)),0.2);
@@ -70,14 +71,21 @@ for i=1:length(dcm_files)
             point2(1) = wallpoint(1) - cos(test_info(ix,2))*thickness_est_pixel/2;
             point2(2) = wallpoint(2) + sin(test_info(ix,2))*thickness_est_pixel/2;
             
-            plot(point1(1),point1(2),'k.','MarkerSize',10); % outer
-            plot(point2(1),point2(2),'r.','MarkerSize',10); % inner
+            %plot(point1(1),point1(2),'k.','MarkerSize',10); % outer
+            %plot(point2(1),point2(2),'r.','MarkerSize',10); % inner
             
             wall.inner = [wall.inner;...
                 [point2*pixelspacingunified dinfo.SliceLocation]];
             wall.outer = [wall.outer;...
                 [point1*pixelspacingunified dinfo.SliceLocation]];
+            point2Dinner  = [point2Dinner; point2];
+            point2Douter  = [point2Douter; point1];
         end
+        % --- Plot contour on image
+        plot([point2Dinner(:,1); point2Dinner(1,1)],[point2Dinner(:,2);...
+            point2Dinner(1,2)],'y-','LineWidth',2);
+        plot([point2Douter(:,1); point2Douter(1,1)],[point2Douter(:,2);...
+            point2Douter(1,2)],'y:','LineWidth',2);
         hold off;
         saveName = [dcm_files(i).name(6:8)];
         saveas(h,['./results/fig/' saveName '.fig']);

@@ -113,3 +113,20 @@ plot(x,y,'r.','MarkerSize',3);
 [img, ~] = dicomread(['./data/P11 S04 AAA/' dcm_files(i).name]);
 image8 = uint8(255 * mat2gray(img));
 
+
+
+% --- Plot a slice of 3-D AAA inner wall
+z_slice = unique(wall.inner(:,end),'rows','stable');
+hold on
+for i=1:8:size(z_slice,1)
+	%figure(i);
+	index_slice = find(wall.inner(:,3)==z_slice(i));
+	S_plot = wall.inner(index_slice,:);
+	S_plot2 = wall.outer(index_slice,:);
+	scatter3(S_plot(:,1),S_plot(:,2),S_plot(:,3),'b*');
+	scatter3(S_plot2(:,1),S_plot2(:,2),S_plot2(:,3),'ro');
+	%S_plot = predict.S_est(index_slice,1:2);
+	%plot(S_plot(:,1),S_plot(:,2),'bo');
+end
+hold off
+
