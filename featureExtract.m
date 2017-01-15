@@ -1,4 +1,4 @@
-function out = featureExtract(directory,option)
+function [data,datainfo] = featureExtract(directory,option)
 %%                           Author Huan Do and Bara
 tic
 % directory.img : dir of images
@@ -14,11 +14,22 @@ tic
 project = load_images(directory.img);
 project = load_mimics(directory.mask,project);
 
-out = patientextract_uniform(project,option.begslice,option.endslice,...
+patientextract = patientextract_uniform(project,option.begslice,option.endslice,...
     option.L,option.x,option.N,option.spacing,option.pts,1,false);
-
+data = [];
+datainfo = []; % slice (1) angle (1) centroid (2) point (2)
+for k=1:length(patientextract)
+    if (length(patientextract(k).point)>2)
+        fprintf('Discarded\n');
+    else
+        tmparray = patientextract(k).array(:,:,1:18); % strim down to match porcine and phantom
+        data = [data; zscore(tmparray(:))'];
+        tmp=[patientextract(k).slice, patientextract(k).angle, patientextract(k).centroid, patientextract(k).point];
+        datainfo = [datainfo; tmp];
+    end
+end
 collapsedtime = toc;
-fprintf('Collapsed time: %.2f (mins)\n',collapsedtime/60);
+fprintf('Data extraction collapsed time: %.2f (mins)\n',collapsedtime/60);
 end
 
 function project = load_mimics(dcm_dir,project)
