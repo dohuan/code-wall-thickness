@@ -24,7 +24,7 @@ for k=1:length(patientextract)
     else
         tmparray = patientextract(k).array(:,:,1:18); % strim down to match porcine and phantom
         data = [data; zscore(tmparray(:))'];
-        tmp=[patientextract(k).slice, patientextract(k).angle, patientextract(k).centroid, patientextract(k).point];
+        tmp=[patientextract(k).slice-1+option.startID, patientextract(k).angle, patientextract(k).centroid, patientextract(k).point];
         datainfo = [datainfo; tmp];
     end
 end

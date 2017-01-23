@@ -44,8 +44,8 @@ C = cell((endslice-begslice+1)*pts,1);
 data = struct('array',C,'xval',C,'spacelat',C,'spaceslice',C,'slice',C,...
     'angle',C,'centroid',C,'point',C);
 
-h_w = waitbar(0,'Extracting features...');
-
+%h_w = waitbar(0,'Extracting features...');
+fprintf('Extracting features...\n');
 for idx = 1:((endslice-begslice)+1)
     
     i = idx+begslice-1; % current slice index
@@ -200,9 +200,9 @@ for idx = 1:((endslice-begslice)+1)
     
     end
     
-    waitbar(idx/((endslice-begslice)+1), h_w);
+    %waitbar(idx/((endslice-begslice)+1), h_w);
     
 end
 
-delete(h_w)
+%delete(h_w)
 close all

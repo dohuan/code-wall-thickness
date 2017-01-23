@@ -5,16 +5,17 @@ function out = load_images(directory)
 % Also returns global minHU and maxHU found in the image set.
 dcm_files = dir([directory '/*.dcm']);
 minHU = 0; maxHU = 0;
-h_w = waitbar(0,'Loading images...');
-set(h_w,'CloseRequestFcn','','WindowStyle','modal')
+fprintf('Loading images...\n');
+%h_w = waitbar(0,'Loading images...');
+%set(h_w,'CloseRequestFcn','','WindowStyle','modal')
 images = cell(0);
 j = 1;
 for i = 1:length(dcm_files)
     if ~dcm_files(i).isdir
         % Read image and dicom tags:
         % (convert image to int16 to allow negative HU values)
-        im = int16(dicomread([directory '\' dcm_files(i).name]));
-        info = dicominfo([directory '\' dcm_files(i).name]);
+        im = int16(dicomread([directory '/' dcm_files(i).name]));
+        info = dicominfo([directory '/' dcm_files(i).name]);
         
         % Rescale pixels into HU values:
         if all(isfield(info,{'RescaleSlope','RescaleIntercept'}))
@@ -46,8 +47,8 @@ for i = 1:length(dcm_files)
     end
 end
 
-waitbar(1.1/1.3,h_w,'Sorting Images...')
-
+%waitbar(1.1/1.3,h_w,'Sorting Images...')
+fprintf('Sorting Images...\n');
 % Sort images by SliceLocation, then subtract smallest SliceLocation
 % from each images so that stored location is relative to this.
 if isfield(info,'SliceLocation')
@@ -70,10 +71,10 @@ i = 1;
 while dcm_files(i).isdir
     i = i+1;
 end
-info = dicominfo([directory '\' dcm_files(i).name]);
+info = dicominfo([directory '/' dcm_files(i).name]);
 pixel_size = info.PixelSpacing(1);
 
-delete(h_w)
+%delete(h_w)
 
 out.original_images = images;
 out.images = images;
