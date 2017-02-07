@@ -130,3 +130,11 @@ for i=1:8:size(z_slice,1)
 end
 hold off
 
+% --- read a folder and flip order of all files
+foldername = './data/data_P11/dicom_mask/S01/';
+fileList = dir([foldername '*.dcm']);
+n = length(fileList);
+for i=1:n
+	newName = ['2-' foldername(end-1) ' (' num2str(n-i+1) ').dcm'];
+	movefile([foldername fileList(i).name],[ foldername newName]);
+end

@@ -24,12 +24,12 @@ for i = 1:length(dcm_files)
         
         images{j,1} = im;
         
-%         if isfield(info,'SliceLocation')
-%             images{j,2} = info.SliceLocation;
-%         else
-%             
-%         end
-        images{j,2} = j;
+        if isfield(info,'SliceLocation')
+            images{j,2} = info.SliceLocation;
+        else
+            images{j,2} = j;
+        end
+        
         % Store min and max HU vals also:
         images{j,3} = min(im(:));
         images{j,4} = max(im(:));
@@ -51,18 +51,18 @@ end
 fprintf('Sorting Images...\n');
 % Sort images by SliceLocation, then subtract smallest SliceLocation
 % from each images so that stored location is relative to this.
-% if isfield(info,'SliceLocation')
-%     images = sortrows(images,2);
-%     images(:,2) = cellfun(@(C){C-images{1,2}},images(:,2));
-% else
-%     images = sortrows(images,-2); % Reverse sorting if no SliceLocation info was used.
-%     % This way will be sorted according to
-%     % import order.
-%     images(:,2) = cellfun(@(C){C-images{end,2}},images(:,2));
-% end
+if isfield(info,'SliceLocation')
+    images = sortrows(images,2);
+    images(:,2) = cellfun(@(C){C-images{1,2}},images(:,2));
+else
+    images = sortrows(images,-2); % Reverse sorting if no SliceLocation info was used.
+    % This way will be sorted according to
+    % import order.
+    images(:,2) = cellfun(@(C){C-images{end,2}},images(:,2));
+end
 
 % The following assigns location 0 to lowest image (and up from there):
-%images(:,2) = num2cell( sort(cell2mat(images(:,2)), 'descend') );
+images(:,2) = num2cell( sort(cell2mat(images(:,2)), 'descend') );
 
 
 % Store images in struct:

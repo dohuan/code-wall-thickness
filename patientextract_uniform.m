@@ -53,16 +53,35 @@ for idx = 1:((endslice-begslice)+1)
     im = project.images(i).image;
     mask = project.masks(maski).data{i};
     
-    stats = regionprops(mask,'centroid');
-    try
-        centroid = stats.Centroid;
-    catch ME
-        if strcmp(ME.identifier,'MATLAB:TooManyOutputsDueToMissingBraces')
-            error('I think we encountered a slice with no mask data.')
+    stats = regionprops(mask,'centroid','area');
+    maxix = 0;
+    maxval = 0;
+    for u=1:length(stats)
+        if stats(u).Area>maxval
+            maxval = stats(u).Area;
+            maxix = u;
         end
     end
+    centroid = stats(maxix).Centroid;
+%     try
+%         centroid = stats.Centroid;
+%     catch ME
+%         if strcmp(ME.identifier,'MATLAB:TooManyOutputsDueToMissingBraces')
+%             error('I think we encountered a slice with no mask data.')
+%         end
+%     end
+    
     B = bwboundaries(mask);
-    B = B{1};
+    maxix = 0;
+    maxval = 0;
+    for u=1:length(B)
+        if size(B{u},1)>maxval
+            maxval = size(B{u},1);
+            maxix = u;
+        end
+    end
+    B = B{maxix};
+    
     % NOTE: B(:,2) are x coords (columns), B(:,1) are y coords (rows)
     
     % Get angle vector, extract feature for each angle in current slice
@@ -83,7 +102,9 @@ for idx = 1:((endslice-begslice)+1)
             centroid(1)+100*cos(angle(a)), centroid(2)-100*sin(angle(a))];
 
         [x0,y0]=intersections(ray(:,1),ray(:,2),B(:,2),B(:,1));
-
+        x0 = mean(x0);
+        y0 = mean(y0);
+        
         if show
             set(hI,'CData',im)
             set(hT,'string',['Slice #: ', num2str(i),...
@@ -185,6 +206,9 @@ for idx = 1:((endslice-begslice)+1)
                     line = (1-weight)*lineabove + weight*linebelow;
 
                 end
+                %a
+                %idx
+                %i
                 array(j,k,:) = line;
             end
         end

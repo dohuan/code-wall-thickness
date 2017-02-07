@@ -1,7 +1,7 @@
 function wall=getWall(ID,scan,datapath,option)
 % --- Extract human feature from DICOM files
-directory.img = [datapath ID ' ' scan ' AAA/'];
-directory.mask = [datapath ID ' ' scan ' AAA Rough Lumen Mask/'];
+directory.img = [datapath 'data_' ID '/dicom/' scan '/'];
+directory.mask = [datapath 'data_' ID '/dicom_mask/' scan '/'];
 [test_x,test_info] = featureExtract(directory,option);
 
 load ./data/data_train
@@ -12,6 +12,7 @@ train.x = train_x(ix(1:cutix),:);
 train.y = train_y(ix(1:cutix),1);
 test.x = train_x(ix(cutix+1:end),:);
 test.y = train_y(ix(cutix+1:end),1);
+
 
 % --- Use REP tree
 FitTree = fitctree(train.x,train.y);
