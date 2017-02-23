@@ -17,7 +17,7 @@ while (flag==1&&raynum<=raymax)
         y = -raystep*i*sin(alpha)+yc; % minus sign b/c of image coordinate
         ray(i,1) = double(img(round(y),round(x))); % x and y are switched
         % since matrix and image use different coordiates:X=row, Y=col
-        if (ray(i,1)~=0)&&(flag==1)
+        if (ray(i,1)~=1)&&(flag==1)
             flag=0;
             wallix = i;
         end

@@ -221,7 +221,7 @@ for idx = 1:((endslice-begslice)+1)
         data(p).angle = angle(a);
         data(p).centroid = centroid;
         data(p).point = [x0,y0];
-    
+        data(p).mask = mask;
     end
     
     %waitbar(idx/((endslice-begslice)+1), h_w);

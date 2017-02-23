@@ -1,4 +1,4 @@
-function [data,datainfo] = featureExtract(directory,option)
+function [data,datainfo,datamask] = featureExtract(directory,option)
 %%                           Author Huan Do and Bara
 tic
 % directory.img : dir of images
@@ -18,6 +18,7 @@ patientextract = patientextract_uniform(project,option.begslice,option.endslice,
     option.L,option.x,option.N,option.spacing,option.pts,1,false);
 data = [];
 datainfo = []; % slice (1) angle (1) centroid (2) point (2)
+datamask = {};
 for k=1:length(patientextract)
     if (length(patientextract(k).point)>2)
         fprintf('Discarded\n');
@@ -26,6 +27,7 @@ for k=1:length(patientextract)
         data = [data; zscore(tmparray(:))'];
         tmp=[patientextract(k).slice-1+option.startID, patientextract(k).angle, patientextract(k).centroid, patientextract(k).point];
         datainfo = [datainfo; tmp];
+        datamask = [datamask, patientextract(k).mask];
     end
 end
 collapsedtime = toc;

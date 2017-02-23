@@ -4,7 +4,8 @@ clc
 set(0,'defaultfigurecolor',[1 1 1])
 %%
 tic
-datapath = 'C:/Users/dohuan.ME197/Documents/GitHub/wall_thickness/data/';
+%datapath = 'C:/Users/dohuan.ME197/Documents/GitHub/wall_thickness/data/';
+datapath = './data/';
 option = struct('begslice',7,'L',8,'x',7,'N',20,'pts',36,'spacing',1); % 7 100
 [ID,scan, startID,endslice] = textread('./data/dataListP11.txt','%s %s %d %d',-1);
 % --- the code starts 7 slices BELOW startID-th slice

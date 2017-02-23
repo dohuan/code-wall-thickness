@@ -2,7 +2,7 @@ function wall=getWall(ID,scan,datapath,option)
 % --- Extract human feature from DICOM files
 directory.img = [datapath 'data_' ID '/dicom/' scan '/'];
 directory.mask = [datapath 'data_' ID '/dicom_mask/' scan '/'];
-[test_x,test_info] = featureExtract(directory,option);
+[test_x,test_info,test_mask] = featureExtract(directory,option);
 
 load ./data/data_train
 % --- use 50-25-25 for train-validate-test, randomly selected
@@ -54,10 +54,11 @@ for i=1:length(dcm_files)
         point2Douter = [];
         for j=1:length(sliceix)
             ix = sliceix(j);
-            J = regiongrowing(img,round(test_info(ix,3)),round(test_info(ix,4)),0.2);
-            [~, wallpoint] = getWallPoint(J,test_info(ix,:));
+            %J = regiongrowing(img,round(test_info(ix,3)),round(test_info(ix,4)),0.2);
+            [~, wallpoint] = getWallPoint(test_mask{ix},test_info(ix,:));
             %track_ray = [track_ray; raytmp'];
             %thickness_est(i,j) = FitObj.B_optimal'*test_x(ix,:)';
+            
             thickness_est = predict(FitTree,test_x(ix,:));
             
             
